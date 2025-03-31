@@ -1,5 +1,5 @@
 {
-  "name": "qgis-js-example-api",
+  "name": "qgis-js-example-ol",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,7 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "ol": "^10.4.0",
+    "ol": "^9.2.4",
     "@qgis-js/ol": "0.0.5",
     "qgis-js": "0.0.5"
   },
