@@ -12,6 +12,15 @@ import { viteStaticCopy } from "vite-plugin-static-copy";
 import packageJson from "./package.json";
 
 export default defineConfig({
+  server:{
+    proxy: {
+      '/qgis-js/leaflet': {
+        target: 'https://tile.openstreetmap.org',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/qgis-js\/leaflet/, '')
+      }
+    }
+  },
   base: "/qgis-js/",
   define: {
     __QGIS_JS_VERSION: JSON.stringify(packageJson.version),

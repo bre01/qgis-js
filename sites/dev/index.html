@@ -5,6 +5,25 @@
     <meta charset="UTF-8" />
     <link rel="icon" href="qgis-icon128.svg" />
     <link href="src/demo.css" rel="stylesheet" type="text/css" />
+    <link
+      href="node_modules/jsoneditor/dist/jsoneditor.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <script src="node_modules/jsoneditor/dist/jsoneditor.min.js"></script>
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+
     <script>
       if (window["SharedArrayBuffer"] === undefined) {
         console.log("Installing COOP/COEP service worker");
@@ -279,7 +298,14 @@ console.dir(center);
       title="Fork me on GitHub"
       >Fork me on GitHub</a
     >
+    <div id="jsoneditor" style="width: 1200px; height: 400px"></div>
+    <div id="jsoneditor2" style="width: 1200px; height: 400px"></div>
+
+    <div id="map"></div>
+
+    <div id="wrapper"></div>
 
     <script type="module" src="src/index.ts"></script>
+    <script type="module" src="src/jsonEditor.js"></script>
   </body>
 </html>

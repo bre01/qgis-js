@@ -77,6 +77,10 @@ export interface CommonQgisApi extends QgisModelConstructors {
     height: number,
     pixelRatio: number,
   ): QgsMapRendererParallelJob;
+
+
+
+
 }
 
 /**
@@ -155,6 +159,10 @@ export interface InternalQgisApi extends CommonQgisApi {
     pixelRatio: number,
     callback: (tileData: ArrayBufferLike) => void,
   ): void;
+  getLayerJson(
+    layerNumber:number,
+    callback:(tileData: string) => void, 
+  ):Promise<string>;
   renderXYZTile(
     x: number,
     y: number,

@@ -1,0 +1,32 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug",
+      "program": "${workspaceFolder}/<executable file>",
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Attach to Chrome",
+      "type": "chrome",
+      "request": "launch",
+      "port": 9222, // Chrome's remote debugging port
+      "timeout": 60000,
+      "url": "http://localhost:5173/qgis-js/", // The URL of your running project
+      //"webRoot": "${workspaceFolder}/sites/dev" ,// Root of your project
+      "webRoot": "${workspaceFolder}/sites/dev",
+      "sourceMapPathOverrides": {
+        "webpack:///./*": "${webRoot}/*",
+        "webpack:///*": "${webRoot}/*",
+        "http://localhost:5173/qgis-js/*": "${workspaceFolder}/*",
+        "http://localhost:5173/qgis-js/@fs/*": "${workspaceFolder}/*"
+      }
+    }
+  ]
+}

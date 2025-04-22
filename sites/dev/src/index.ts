@@ -62,6 +62,7 @@ async function initDemo() {
   const projectControl = document.getElementById("project")! as HTMLDivElement;
 
   let isError = false;
+  //on status will be showed at that button 
   const onStatus = (status: string) => {
     if (isError) return;
     (statusControl.firstElementChild! as HTMLDivElement).innerHTML = status;
@@ -183,6 +184,9 @@ async function initDemo() {
     onStatus("Rendering first frame...");
     if (timer) console.time("first frame");
     await api.renderImage(api.srid(), api.fullExtent(), 42, 42, 1);
+    console.log("hello")
+    console.log(await api.getLayerJson(1));
+     
     if (timer) console.timeEnd("first frame");
 
     onReady();

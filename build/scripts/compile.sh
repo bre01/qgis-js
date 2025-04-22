@@ -6,6 +6,7 @@ $(find . -iwholename './build/vcpkg/downloads/tools/cmake-*/*/bin/cmake' | grep 
 -S . \
 -B build/wasm \
 -G Ninja \
+-D CMAKE_EXPORT_COMPILE_COMMANDS=ON \
 -DCMAKE_TOOLCHAIN_FILE=$PWD/build/vcpkg/scripts/buildsystems/vcpkg.cmake \
 -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=$PWD/build/vcpkg-toolchains/qgis-js.cmake \
 -DVCPKG_OVERLAY_TRIPLETS=./build/vcpkg-triplets \

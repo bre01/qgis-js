@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
   QgsApplication::init(temp.path());
   QgsApplication::setPkgDataPath("/qgis"); // as set in CMakeLists.txt
 
-  int maxThreads = 4;
+  int maxThreads = 32;
   emscripten::val qgisJsMaxThreads = emscripten::val::module_property("qgisJsMaxThreads");
   if (!qgisJsMaxThreads.isUndefined()) {
     int maxThreadsValue = qgisJsMaxThreads.as<int>();

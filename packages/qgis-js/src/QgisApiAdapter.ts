@@ -25,6 +25,18 @@ export class QgisApiAdapterImplementation implements QgisApiAdapter {
     return this._limit(fn);
   }
 
+  getLayerJson(layerNumber:number): Promise<string> {
+      return this.runLimited(() => {
+        return new Promise((resolve) => {
+          this._api.getLayerJson(
+            layerNumber, 
+            (stringData) => {
+            resolve(stringData);
+          });
+        });
+      })
+  }
+
   renderImage(
     srid: string,
     extent: Rectangle,

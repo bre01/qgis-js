@@ -22,6 +22,17 @@
 
 #include <emscripten/bind.h>
 
+//dev
+#include<qgsfields.h>
+
+#include<qgsfield.h>
+#include<qgsvectorlayer.h>
+#include <qgsvectorfilewriter.h>
+#include<qgsfeature.h>
+#include<qgsjsonutils.h>
+
+
+
 QList<QgsMapLayer *> QgisApi_allLayers() {
   return QgsProject::instance()->layerTreeRoot()->layerOrder();
 }
@@ -37,6 +48,155 @@ QList<QgsMapLayer *> QgisApi_visibleLayers() {
     }
   }
   return result;
+}
+//pass fields out as string 
+
+/*
+void QgisApi_getFields(emscripten::val callback) {
+  QgsVectorLayer *layer = static_cast<QgsVectorLayer*> (QgisApi_visibleLayers().first());
+  QString result = "";
+  for(const QgsField &field : layer->fields()) {
+    result.append(field.name() );
+  }
+  callback(emscripten::val(result.toStdString()));
+  QgsVectorLayer *layer = static_cast<QgsVectorLayer *>(QgisApi_visibleLayers().first());
+  if (!layer || !layer->isValid()) {
+    callback(emscripten::val("")); // Return an empty string if the layer is invalid
+    return;
+  }
+
+  // Prepare a string to hold the GeoJSON
+  QString geojson;
+  QTextStream stream(&geojson);
+
+  // Write the layer to GeoJSON format
+  QgsVectorFileWriter::writeAsVectorFormat(
+    layer, 
+    stream, 
+    "utf-8", 
+    layer->crs(), 
+    "GeoJSON"
+  );
+
+  // Pass the GeoJSON string to the JavaScript callback
+  callback(emscripten::val(geojson.toStdString()));
+  QgsVectorLayer *layer = static_cast<QgsVectorLayer *>(QgisApi_visibleLayers().first());
+  if (!layer || !layer->isValid()) {
+    callback(emscripten::val("layer not valid")); // Return an empty string if the layer is invalid
+    return;
+  }
+
+  // Prepare a string to hold the GeoJSON
+  QString geojson;
+  QgsVectorFileWriter::SaveVectorOptions options;
+  options.driverName = "GeoJSON"; // Specify the format
+  options.fileEncoding = "UTF-8"; // Set the encoding
+
+
+  // Write the layer to GeoJSON format
+  QgsVectorFileWriter::WriterError error = QgsVectorFileWriter::writeAsVectorFormatV2(
+    layer,
+    geojson,
+    QgsCoordinateTransformContext(),
+    options
+  );
+  if (error != QgsVectorFileWriter::NoError) {
+    callback(emscripten::val("error")); // Return an empty string if there was an error
+    return;
+  }
+
+  // Pass the GeoJSON string to the JavaScript callback
+  callback(emscripten::val(geojson.toStdString()));
+ 
+  QgsVectorLayer *layer = static_cast<QgsVectorLayer *>(QgisApi_allLayers().first());
+  if (!layer || !layer->isValid()) {
+    callback(emscripten::val("layer invalid")); // Return an empty string if the layer is invalid
+    return;
+  }
+
+    if (!layer || !layer->isValid())
+        callback(emscripten::val("not valid"));
+
+    // Configure export options
+    QgsVectorFileWriter::SaveVectorOptions options;
+    options.driverName = "GeoJSON";
+    options.fileEncoding = "UTF-8";
+
+    // Create a temporary file for GeoJSON output
+    QTemporaryFile tempFile;
+    if (!tempFile.open())
+        callback(emscripten::val("temp file not open"));
+
+    QString tempFilePath = tempFile.fileName();
+    tempFile.close(); // Close the file so it can be written to
+
+    // Export the layer to the temporary file
+    QString errorMessage;
+    QgsVectorFileWriter::WriterError error = QgsVectorFileWriter::writeAsVectorFormatV3(
+        layer,
+        tempFilePath,
+        QgsCoordinateTransformContext(),
+        options,
+        &errorMessage
+    );
+
+    if (error != QgsVectorFileWriter::NoError)
+    {
+        callback(emscripten::val((int)error));
+    }
+
+    // Read the GeoJSON content from the temporary file
+    QFile file(tempFilePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        callback(emscripten::val("152"));
+
+    QTextStream in(&file);
+    QString geoJsonString = in.readAll();
+    file.close();
+
+    // Clean up the temporary file
+    QFile::remove(tempFilePath);
+    callback(emscripten::val("end"));
+    //callback(emscripten::val(geoJsonString.toStdString()));
+    return ;
+}
+*/
+QgsFeatureList getAllFeatures(QgsVectorLayer *layer)
+{
+    QgsFeatureList featureList;
+
+    if (!layer)
+    {
+        qWarning() << "Layer is null.";
+        return featureList;
+    }
+
+    // Create a feature iterator to iterate over all features in the layer
+    QgsFeatureIterator featureIterator = layer->getFeatures();
+
+    QgsFeature feature;
+    while (featureIterator.nextFeature(feature))
+    {
+        featureList.append(feature);
+    }
+
+    return featureList;
+}
+
+void QgisApi_getLayerJson(int layerNumber,emscripten::val callback) {
+  // Get the first layer from all layers
+  QgsVectorLayer* vectorLayer=qobject_cast<QgsVectorLayer*>(QgisApi_allLayers()[layerNumber]);
+
+
+    QgsJsonExporter exporter(vectorLayer,5);
+    QgsFeatureList featureList = getAllFeatures(vectorLayer);
+    QString res= exporter.exportFeatures(featureList,0);
+
+
+
+
+  // Pass the GeoJSON string to the JavaScript callback
+  callback(emscripten::val(res.toStdString()));
 }
 
 bool QgisApi_loadProject(std::string filename) {
@@ -156,7 +316,6 @@ void QgisApi_renderImage(
       image.width() * image.height() * 4, (const unsigned char *)image.constBits())));
     job->deleteLater();
   });
-
   job->start();
 }
 
@@ -270,5 +429,7 @@ EMSCRIPTEN_BINDINGS(QgisApi) {
   emscripten::function("mapThemes", &QgisApi_mapThemes);
   emscripten::function("getMapTheme", &QgisApi_getMapTheme);
   emscripten::function("setMapTheme", &QgisApi_setMapTheme);
+  emscripten::function("getLayerJson", &QgisApi_getLayerJson);
   emscripten::register_vector<std::string>("vector<std::string>");
+
 }
