@@ -1,2 +1,0 @@
-qtbase[gles2] is only supported on '!windows & !osx', which does not match x64-osx-release. This usually means that there are known build failures, or runtime problems, when building other platforms. To ignore this and attempt to build qtbase anyway, rerun vcpkg with `--allow-unsupported`.
-qtbase[gles3] is only supported on '!windows & !osx', which does not match x64-osx-release. This usually means that there are known build failures, or runtime problems, when building other platforms. To ignore this and attempt to build qtbase anyway, rerun vcpkg with `--allow-unsupported`.

@@ -7,7 +7,6 @@ import { CrossOriginIsolationResponseHeaders } from "./CrossOriginIsolationPlugi
 
 import type { Plugin, ResolvedConfig } from "vite";
 
-//roll up emit file
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const RUNTIME_JS = "js";

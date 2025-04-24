@@ -7,5 +7,6 @@ packages/*/dist
 packages/*/etc
 bin/act
 docs/api
+build/native/
 .DS_Store
 sites/dev/public/projects/
