@@ -7,12 +7,11 @@ set(QT_IS_LATEST ON)
 
 ## All above goes into the qt_port_hashes in the future
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/qt_install_submodule.cmake")
-
 set(${PORT}_PATCHES
         # CVE fixes from https://download.qt.io/official_releases/qt/6.6/
         patches/0001-CVE-2023-51714-qtbase-6.6.diff
         patches/0002-CVE-2023-51714-qtbase-6.6.diff
-
+        my.patch
         allow_outside_prefix.patch
         config_install.patch
         fix_cmake_build.patch
@@ -319,6 +318,7 @@ qt_install_submodule(PATCHES    ${${PORT}_PATCHES}
                         -DQT_USE_BUNDLED_BundledPcre2:BOOL=FALSE
                         -DINPUT_bundled_xcb_xinput:STRING=no
                         -DFEATURE_force_debug_info:BOOL=ON
+                        -DCMAKE_CXX_FLAGS="-DQT_NO_DEBUG"
                      CONFIGURE_OPTIONS_RELEASE
                      CONFIGURE_OPTIONS_DEBUG
                         -DFEATURE_debug:BOOL=ON

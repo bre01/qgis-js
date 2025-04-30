@@ -105,15 +105,17 @@ export class CompileAction extends CommandLineAction {
 -S . \
 -B build/wasm \
 -G Ninja \
+-D CMAKE_EXPORT_COMPILE_COMMANDS=ON \
 -DCMAKE_TOOLCHAIN_FILE=${repo}/build/vcpkg/scripts/buildsystems/vcpkg.cmake \
 -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=${repo}/build/vcpkg-toolchains/qgis-js.cmake \
 -DVCPKG_OVERLAY_TRIPLETS=./build/vcpkg-triplets \
 -DVCPKG_OVERLAY_PORTS=./build/vcpkg-ports \
 -DVCPKG_TARGET_TRIPLET=wasm32-emscripten-qt-threads \
--DCMAKE_BUILD_TYPE=${buildType !== "Dev" ? buildType : ""}`;
+-DCMAKE_BUILD_TYPE=${buildType !== "Dev" ? buildType : ""} \
+-D QT_NO_DEBUG=1`;
 
         // build
-        await $`${cmake} --build build/wasm`;
+        await $`${cmake} --build build/wasm -j16`;
       } catch (error) {
         reject(error);
         return;

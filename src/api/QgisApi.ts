@@ -60,6 +60,19 @@ export interface CommonQgisApi extends QgisModelConstructors {
    */
   setMapTheme(mapTheme: string): boolean;
 
+
+  /**
+   * update underlying data from Json modified in client
+   * 
+   * @param 
+   * @returns true if the data is updated successfully
+   * 
+   */
+  setLayerByJson(
+    layerNum: number,
+    layerJson: string,
+    callback: (tileData: boolean) => void,): void;
+
   /**
    * Renders an image of the loaded project and provides a QgsMapRendererParallelJob object to monitor the rendering progress and to retrieve preview images.
    *
@@ -139,7 +152,7 @@ export interface QgisApiAdapter {
 /**
  * Interface representing the public QgisApi.
  */
-export interface QgisApi extends CommonQgisApi, QgisApiAdapter {}
+export interface QgisApi extends CommonQgisApi, QgisApiAdapter { }
 
 /**
  * The internal Qgis API which can be accessed from the QgisRuntimeModule
@@ -166,4 +179,8 @@ export interface InternalQgisApi extends CommonQgisApi {
   ): number;
   mapLayers(): any;
   mapThemes(): any;
+  getLayerJson(
+    layerNumber: number,
+    callback: (tileData: string) => void,
+  ): Promise<string>;
 }

@@ -75,6 +75,28 @@ export class QgisApiAdapterImplementation implements QgisApiAdapter {
       });
     });
   }
+  getLayerJson(layerNumber: number): Promise<string> {
+    return this.runLimited(() => {
+      return new Promise((resolve) => {
+        this._api.getLayerJson(
+          layerNumber,
+          (stringData) => {
+            resolve(stringData);
+          });
+      });
+    })
+  }
+  setLayerByJson(layerNum: number, layerString: string): Promise<boolean> {
+    return this.runLimited(() => {
+      return new Promise((resolve) => {
+        this._api.setLayerByJson(
+          layerNum,
+          layerString,
+          (st) => { resolve(st); }
+        );
+      });
+    })
+  }
 
   mapLayers(): readonly MapLayer[] {
     const mapLayersRaw = this._api.mapLayers();

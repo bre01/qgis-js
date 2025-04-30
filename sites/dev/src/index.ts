@@ -9,6 +9,7 @@ import { jsDemo } from "./js";
 
 import { olPreview, olDemoXYZ, olDemoCanvas } from "./ol";
 import { layersControl } from "./layers";
+import { showJson, getLayerJson } from "./myTable";
 
 const printVersion = true;
 const apiTest = false;
@@ -34,11 +35,11 @@ const GITHUB_REPOS: Array<{
   branch?: string;
   prefix?: string;
 }> = [
-  qgisJsDemoProjects("demo"),
-  ...(isDev()
-    ? ["test", "performance"].map((path) => qgisJsDemoProjects(path))
-    : []),
-];
+    qgisJsDemoProjects("demo"),
+    ...(isDev()
+      ? ["test", "performance"].map((path) => qgisJsDemoProjects(path))
+      : []),
+  ];
 
 function testApi(api: QgisApi) {
   const p1 = new api.PointXY();
@@ -62,6 +63,7 @@ async function initDemo() {
   const projectControl = document.getElementById("project")! as HTMLDivElement;
 
   let isError = false;
+  //on status will be showed at that button 
   const onStatus = (status: string) => {
     if (isError) return;
     (statusControl.firstElementChild! as HTMLDivElement).innerHTML = status;
@@ -183,6 +185,7 @@ async function initDemo() {
     onStatus("Rendering first frame...");
     if (timer) console.time("first frame");
     await api.renderImage(api.srid(), api.fullExtent(), 42, 42, 1);
+
     if (timer) console.timeEnd("first frame");
 
     onReady();
@@ -205,8 +208,10 @@ async function initDemo() {
     const jsDemoCanvas = document.getElementById(
       "js-demo-canvas",
     ) as HTMLCanvasElement | null;
+    let takeout;
     if (jsDemoCanvas) {
       const { update, render } = jsDemo(jsDemoCanvas, api);
+      takeout = () => { update(), render() };
       updateCallbacks.push(update);
       renderCallbacks.push(render);
       // ensure js demo gets refreshed when the section gets visible
@@ -214,6 +219,29 @@ async function initDemo() {
       jsButton.addEventListener("change", () => {
         if (jsButton.checked) update();
       });
+    }
+    console.log("hello")
+    const button = document.getElementById("saveChange")!;
+    const json = await JSON.parse((await api.getLayerJson(0)));
+    const container = document.getElementById("jsoneditor");
+    const editor = showJson(json, container!);
+    button.onclick = () => {
+      const raw = getLayerJson(editor);
+      let str = JSON.stringify(raw, null, 2);
+
+      // 2. Replace start of each feature with line break (to match `{\n"type": ...}` pattern)
+      str = str.replace(/(\{\s*"type":\s*"Feature")/g, '\n$1');
+
+      // 3. Collapse to single line, escaping necessary characters for QStringLiteral
+      str = str
+        .replace(/\n/g, '\\n')               // Escape newlines
+        .replace(/"/g, '\\"')                // Escape double quotes
+        .replace(/\\/g, '\\\\');             // Escape backslashes
+
+      // 4. Wrap in double quotes (C++ string literal style)
+      const finalCppString = `"${str}"`;
+      console.log(finalCppString);
+      api.setLayerByJson(0, finalCppString).then(console.log);
     }
 
     // ol demo

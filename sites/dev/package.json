@@ -13,7 +13,9 @@
   "dependencies": {
     "@qgis-js/ol": "workspace:*",
     "@qgis-js/utils": "workspace:*",
-    "qgis-js": "workspace:*"
+    "qgis-js": "workspace:*",
+    "jsoneditor": "^10.2.0",
+    "nanostores": "^1.0.1"
   },
   "devDependencies": {
     "coi-serviceworker": "0.1.7",

@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.15)
 project(qgis-js CXX)
 
 set(CMAKE_CXX_STANDARD 17)
-
 find_package(unofficial-sqlite3 CONFIG REQUIRED)
 find_package(PROJ CONFIG REQUIRED)
 find_package(GEOS CONFIG REQUIRED)

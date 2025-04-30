@@ -1,3 +1,6 @@
+compile_commands.json
+launch.json
+.cache/
 package-lock.json
 CMakeLists.txt.user
 build/wasm

@@ -1,3 +1,5 @@
+#include <ostream>
+#include <random>
 #include <string>
 
 #include <qgsexpressioncontextutils.h>
@@ -19,8 +21,18 @@
 #include "../model/QgsMapRendererParallelJob.hpp"
 #include "../model/QgsMapRendererQImageJob.hpp"
 #include "../model/Rectangle.hpp"
+#include "qgsVectorlayercache.h"
+#include "qgsfeature.h"
+#include "qgsfieldconstraints.h"
+#include "qgsfields.h"
+#include "qgspointlocator.h"
+#include "qgsvectorlayer.h"
+#include <qgsjsonutils.h>
+
+#include "QTextCodec.h"
 
 #include <emscripten/bind.h>
+#include <sys/errno.h>
 
 QList<QgsMapLayer *> QgisApi_allLayers() {
   return QgsProject::instance()->layerTreeRoot()->layerOrder();
@@ -40,8 +52,7 @@ QList<QgsMapLayer *> QgisApi_visibleLayers() {
 }
 
 bool QgisApi_loadProject(std::string filename) {
-  Qgis::ProjectReadFlags readFlags =
-    Qgis::ProjectReadFlag::ForceReadOnlyLayers | Qgis::ProjectReadFlag::TrustLayerMetadata;
+  Qgis::ProjectReadFlags readFlags = Qgis::ProjectReadFlag::TrustLayerMetadata;
 
   bool res = QgsProject::instance()->read(QString::fromStdString(filename), readFlags);
   if (!res) return false;
@@ -257,6 +268,103 @@ const bool QgisApi_setMapTheme(std::string themeName) {
   }
 }
 
+inline const char *const BoolToString(bool b) {
+  return b ? "true\n" : "false\n";
+}
+void QgisApi_setLayerByJson(int layerNumber, std::string layerJson, emscripten::val callback) {
+  std::string myStr = R"({
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [-112.06883, 33.54412]
+                },
+                "properties": {
+                    "name": "PHOENIX",
+                    "population": 983403,
+                    "state": "AZ"
+                }
+            }
+        ]
+  })";
+
+  std::string resList;
+
+  QString str;
+  str.fromStdString(layerJson);
+
+  QgsVectorLayer *vectorLayer = qobject_cast<QgsVectorLayer *>(QgisApi_allLayers()[layerNumber]);
+  QgsFields fields = QgsJsonUtils::stringToFields(str, QTextCodec::codecForName("System"));
+  resList += "fields: ";
+  resList += std::to_string(fields.count());
+  resList += "\n";
+  QgsFeatureList featureList =
+    QgsJsonUtils::stringToFeatureList(str, fields, QTextCodec::codecForName("System"));
+  int beforeCount = vectorLayer->featureCount();
+  int cap = vectorLayer->dataProvider()->attributeEditCapabilities();
+  resList += "cap(int): ";
+  resList += std::to_string(cap);
+  resList += "\n";
+
+  bool setRes = vectorLayer->setReadOnly(false);
+  resList += "setRes: ";
+  resList += BoolToString(setRes);
+
+  vectorLayer->startEditing();
+  vectorLayer->deleteFeatures(vectorLayer->allFeatureIds());
+  int num = featureList.count();
+  vectorLayer->addFeatures(featureList);
+
+  bool res = vectorLayer->commitChanges();
+  resList += "res: ";
+  resList += BoolToString(res);
+
+  int afterCount = vectorLayer->featureCount();
+  int featureListCount = featureList.count();
+  resList += std::to_string(beforeCount);
+  resList += "\n";
+  resList += std::to_string(afterCount);
+  resList += "\n";
+  resList += std::to_string(featureListCount);
+  resList += "\n";
+  callback(emscripten::val(resList));
+}
+
+//this is complex, how about just iterate the field
+//since i'm not going to change geometry
+
+QgsFeatureList getAllFeatures(QgsVectorLayer *layer) {
+  QgsFeatureList featureList;
+
+  if (!layer) {
+    qWarning() << "Layer is null.";
+    return featureList;
+  }
+
+  // Create a feature iterator to iterate over all features in the layer
+  QgsFeatureIterator featureIterator = layer->getFeatures();
+
+  QgsFeature feature;
+  while (featureIterator.nextFeature(feature)) {
+    featureList.append(feature);
+  }
+
+  return featureList;
+}
+void QgisApi_getLayerJson(int layerNumber, emscripten::val callback) {
+  // Get the first layer from all layers
+  QgsVectorLayer *vectorLayer = qobject_cast<QgsVectorLayer *>(QgisApi_allLayers()[layerNumber]);
+
+  QgsJsonExporter exporter(vectorLayer, 5);
+  QgsFeatureList featureList = getAllFeatures(vectorLayer);
+  QString res = exporter.exportFeatures(featureList, 0);
+
+  // Pass the GeoJSON string to the JavaScript callback
+  callback(emscripten::val(res.toStdString()));
+}
+
 EMSCRIPTEN_BINDINGS(QgisApi) {
   emscripten::function("loadProject", &QgisApi_loadProject);
   emscripten::function("fullExtent", &QgisApi_fullExtent);
@@ -270,5 +378,7 @@ EMSCRIPTEN_BINDINGS(QgisApi) {
   emscripten::function("mapThemes", &QgisApi_mapThemes);
   emscripten::function("getMapTheme", &QgisApi_getMapTheme);
   emscripten::function("setMapTheme", &QgisApi_setMapTheme);
+  emscripten::function("setLayerByJson", &QgisApi_setLayerByJson);
   emscripten::register_vector<std::string>("vector<std::string>");
+  emscripten::function("getLayerJson", &QgisApi_getLayerJson);
 }

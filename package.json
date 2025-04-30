@@ -38,16 +38,19 @@
     "lint:clang-format": "clang-format -i \"--glob=src/**/*.{cpp,hpp}\""
   },
   "devDependencies": {
-    "pnpm": "10.6.5",
-    "vite": "6.2.2",
-    "vite-node": "3.0.9",
-    "zx": "8.4.1",
-    "@rushstack/ts-command-line": "4.23.6",
-    "ts-markdown": "1.2.0",
-    "@microsoft/api-extractor": "7.52.1",
     "@microsoft/api-documenter": "7.26.17",
+    "@microsoft/api-extractor": "7.52.1",
+    "@rushstack/ts-command-line": "4.23.6",
+    "clang-format": "1.8.0",
+    "pnpm": "10.6.5",
     "prettier": "3.5.3",
     "pretty-quick": "4.1.1",
-    "clang-format": "1.8.0"
+    "ts-markdown": "1.2.0",
+    "vite": "6.2.2",
+    "vite-node": "3.0.9",
+    "zx": "8.4.1"
+  },
+  "dependencies": {
+    "@types/jsoneditor": "^9.9.5"
   }
 }
