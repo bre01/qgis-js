@@ -7,13 +7,9 @@
   <link rel="icon" href="qgis-icon128.svg" />
   <link href="src/demo.css" rel="stylesheet" type="text/css" />
   <link href="node_modules/jsoneditor/dist/jsoneditor.min.css" rel="stylesheet" type="text/css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
   <script src="node_modules/jsoneditor/dist/jsoneditor.min.js"></script>
   <!-- Make sure you put this AFTER Leaflet's CSS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
   <script>
     if (window["SharedArrayBuffer"] === undefined) {
       console.log("Installing COOP/COEP service worker");
@@ -46,7 +42,9 @@
     <label for="tab2">ol: XYZ Tiles </label>
     --->
     <input type="radio" name="tabset" id="tab1" aria-controls="javascript" checked />
-    <label for="tab3">JavaScript</label>
+    <label for="tab1">JavaScript</label>
+    <input type="radio" name="tabset" id="tab2" aria-controls="leaf" checked />
+    <label for="tab2">leaf</label>
 
     <div id="status">
       <div id="status-message">Initializing...</div>
@@ -167,6 +165,23 @@
             <button id="pandown">down</button>
           </div>
         </div>
+      </section>
+      <section id="leaf" class="tab-panel">
+        <h2>leaflet</h2>
+        <div id="js-demo" class="demo">
+          <div id="map"></div>
+
+          <div id="js-demo-controls">
+            <button id="zoomin">zoom in</button>
+            <button id="zoomout">zoom out</button>
+            <button id="panleft">left</button>
+            <button id="panright">right</button>
+            <button id="panup">up</button>
+            <button id="pandown">down</button>
+          </div>
+        </div>
+
+
         <!--
         <p>
           <strong>qgis-js</strong> can be used with plain JavaScript and can
@@ -212,15 +227,13 @@ console.dir(center);
     title="Fork me on GitHub">Fork me on GitHub</a>
   -->
   <div id="jsoneditor" style="width: 1200px; height: 400px"></div>
-  <button id="saveChange" style="width: 20px ;height:20p ">save</button>
-  <div id="jsoneditor2" style="width: 1200px; height: 400px"></div>
+  <button id="savePro" style="width: 100px ;height:20p ">save properties</button>
+  <button id="saveVector" style="width: 100px ;height:20p ">save vector</button>
 
-  <div id="map"></div>
 
   <div id="wrapper"></div>
 
   <script type="module" src="src/index.ts"></script>
-  <script type="module" src="src/jsonEditor.js"></script>
 </body>
 
 </html>

@@ -6,6 +6,7 @@ import { useProjects } from "@qgis-js/utils";
 import type { Project } from "@qgis-js/utils";
 
 import { jsDemo } from "./js";
+import { leafDemo } from "./leaf";
 
 import { olPreview, olDemoXYZ, olDemoCanvas } from "./ol";
 import { layersControl } from "./layers";
@@ -235,13 +236,13 @@ async function initDemo() {
       renderCallbacks.push(render);
       // ensure js demo gets refreshed when the section gets visible
       const jsButton = document.getElementById("tab1") as HTMLInputElement;
-      jsButton.checked = true;
       jsButton.addEventListener("change", () => {
         if (jsButton.checked) update();
       });
     }
     console.log("hello")
-    const button = document.getElementById("saveChange")!;
+    const buttonPro = document.getElementById("savePro")!;
+    const buttonVec = document.getElementById("saveVector")
     const json = await JSON.parse((await api.getLayerJson(0)));
     const container = document.getElementById("jsoneditor");
     const editor = showJson(json, container!);
@@ -250,7 +251,7 @@ async function initDemo() {
       'features': null,
     }
 
-    button.onclick = () => {
+    buttonPro.onclick = () => {
       const raw = getLayerJson(editor);
       //let str = JSON.stringify(json, null, 2);
       const orderedJSON = Object.assign(objectOrder, raw)
@@ -259,6 +260,24 @@ async function initDemo() {
       api.setLayerByJson(0, str).then(console.log);
       handle.downloadAllFromFs("hah");
     }
+
+    const leafCanvas = document.getElementById(
+      "leaf",
+    ) as HTMLCanvasElement | null;
+    if (leafCanvas) {
+      const { update, render } = leafDemo(leafCanvas, api);
+      //updateCallbacks.push(update);
+      //renderCallbacks.push(render);
+    }
+
+
+
+
+
+
+
+
+
 
     // ol demo
     const olDemoPreviewDiv = document.getElementById(
