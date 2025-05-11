@@ -56,4 +56,40 @@ export class LocalProject extends Project {
       );
     }
   }
+  async getFileFromfs(path: string): Promise<Uint8Array> {
+    console.log(this.entries[0].webkitRelativePath);
+    const fullPath = PROJECTS_UPLOAD_DIR + "/" + this.entries[0].webkitRelativePath;
+    try {
+      const data = this.FS.readFile(fullPath);
+      return data; // this is a Uint8Array
+    } catch (e) {
+      console.error("Failed to read file from MEMFS:", fullPath, e);
+      throw e;
+    }
+  }
+  async downloadAllFromFs(): Promise<void> {
+    for (const file of this.entries) {
+      const relativePath = file.webkitRelativePath;
+      const fullPath = PROJECTS_UPLOAD_DIR + "/" + relativePath;
+      try {
+        const data = this.FS.readFile(fullPath); // Uint8Array
+        const blob = new Blob([data]);
+        const url = URL.createObjectURL(blob);
+  
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = relativePath.split("/").pop()!; // just the filename
+        a.style.display = "none";
+  
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        console.error("Failed to download file:", fullPath, e);
+      }
+    }
+  }
+
+
 }

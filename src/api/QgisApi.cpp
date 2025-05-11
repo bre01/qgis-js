@@ -272,28 +272,27 @@ inline const char *const BoolToString(bool b) {
   return b ? "true\n" : "false\n";
 }
 void QgisApi_setLayerByJson(int layerNumber, std::string layerJson, emscripten::val callback) {
-  std::string myStr = R"({
-        "type": "FeatureCollection",
-        "features": [
-            {
-                "type": "Feature",
-                "geometry": {
-                    "type": "Point",
-                    "coordinates": [-112.06883, 33.54412]
-                },
-                "properties": {
-                    "name": "PHOENIX",
-                    "population": 983403,
-                    "state": "AZ"
-                }
-            }
-        ]
-  })";
 
   std::string resList;
-
-  QString str;
-  str.fromStdString(layerJson);
+  
+  QString str = QString::fromUtf8(layerJson);
+  /*
+  QString jsonString = R"({
+    "features": [
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [102.0, 0.5]
+        },
+        "type": "Feature",
+        "properties": {
+          "name": "Test Point"
+        }
+      }
+    ],
+    "type": "FeatureCollection"
+  })";
+  */
 
   QgsVectorLayer *vectorLayer = qobject_cast<QgsVectorLayer *>(QgisApi_allLayers()[layerNumber]);
   QgsFields fields = QgsJsonUtils::stringToFields(str, QTextCodec::codecForName("System"));
@@ -302,6 +301,7 @@ void QgisApi_setLayerByJson(int layerNumber, std::string layerJson, emscripten::
   resList += "\n";
   QgsFeatureList featureList =
     QgsJsonUtils::stringToFeatureList(str, fields, QTextCodec::codecForName("System"));
+    
   int beforeCount = vectorLayer->featureCount();
   int cap = vectorLayer->dataProvider()->attributeEditCapabilities();
   resList += "cap(int): ";

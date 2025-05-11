@@ -87,13 +87,13 @@ async function initDemo() {
 
   try {
     // boot the runtime
-    if (timer) console.time("boot");
+    //if (timer) console.time("boot");
     const { api, fs } = await qgis({
       // use assets form QgisRuntimePlugin
       prefix: new URL("assets/wasm", window.location.href).pathname,
       onStatus: (status: string) => onStatus(status),
     });
-    if (timer) console.timeEnd("boot");
+    //if (timer) console.timeEnd("boot");
 
     // prepare project management
     onStatus("Loading projects...");
@@ -106,11 +106,16 @@ async function initDemo() {
       loadRemoteProjects,
       loadGithubProjects,
     } = useProjects(fs, (project: string) => {
-      if (timer) console.time("project");
+      //this lambda is responsible to load project 
+      //and to update() 
+
+      //if (timer) console.time("project");
       api.loadProject(project);
-      if (timer) console.timeEnd("project");
+      //if (timer) console.timeEnd("project");
 
       // update all demos
+      //this is add all the update callbacks to microTask, so that it will not run 
+      //until next iteration
       setTimeout(() => {
         updateCallbacks.forEach((update) => update());
       }, 0);
@@ -120,12 +125,16 @@ async function initDemo() {
     const projectSelect = document.getElementById(
       "projects",
     )! as HTMLSelectElement;
+
+    //of cource we open project when we change another project
     projectSelect.addEventListener("change", () => {
       const project = projects.get(projectSelect.value);
       if (project) {
         openProject(project());
       }
     });
+
+
     const listProject = (
       name: string,
       projectLoadFunciton: () => Project | Promise<Project>,
@@ -136,22 +145,32 @@ async function initDemo() {
       option.text = name;
       projectSelect.add(option, null);
     };
+    // this is to put the project into that select 
+
+
+
+    let handle;
     document.getElementById("local-project")!.onclick = async function () {
       const localProject = await loadLocalProject();
+      handle = localProject;
       await openProject(localProject);
       listProject(localProject.name, () => localProject);
       projectSelect.value = localProject.name;
     };
 
     // load remote projects
-    if (timer) console.time("remote projects");
+    //if (timer) console.time("remote projects");
     // - remote projects
+
     const remoteProjects = await loadRemoteProjects();
     remoteProjects.forEach((project) =>
       listProject(project.name, () => project),
     );
-    if (timer) console.timeEnd("remote projects");
 
+
+
+    //if (timer) console.timeEnd("remote projects");
+    /*
     // - github projects
     if (timer) console.time("github projects");
     for (const repo of GITHUB_REPOS) {
@@ -173,6 +192,7 @@ async function initDemo() {
       }
     }
     if (timer) console.timeEnd("github projects");
+    */
 
     // open first project
     onStatus("Opening first project...");
@@ -189,7 +209,6 @@ async function initDemo() {
     if (timer) console.timeEnd("first frame");
 
     onReady();
-
     const layersControlDiv = document.getElementById(
       "layers-control",
     ) as HTMLDivElement | null;
@@ -216,6 +235,7 @@ async function initDemo() {
       renderCallbacks.push(render);
       // ensure js demo gets refreshed when the section gets visible
       const jsButton = document.getElementById("tab1") as HTMLInputElement;
+      jsButton.checked = true;
       jsButton.addEventListener("change", () => {
         if (jsButton.checked) update();
       });
@@ -225,23 +245,19 @@ async function initDemo() {
     const json = await JSON.parse((await api.getLayerJson(0)));
     const container = document.getElementById("jsoneditor");
     const editor = showJson(json, container!);
+    const objectOrder = {
+      'type': null,
+      'features': null,
+    }
+
     button.onclick = () => {
       const raw = getLayerJson(editor);
-      let str = JSON.stringify(raw, null, 2);
-
-      // 2. Replace start of each feature with line break (to match `{\n"type": ...}` pattern)
-      str = str.replace(/(\{\s*"type":\s*"Feature")/g, '\n$1');
-
-      // 3. Collapse to single line, escaping necessary characters for QStringLiteral
-      str = str
-        .replace(/\n/g, '\\n')               // Escape newlines
-        .replace(/"/g, '\\"')                // Escape double quotes
-        .replace(/\\/g, '\\\\');             // Escape backslashes
-
-      // 4. Wrap in double quotes (C++ string literal style)
-      const finalCppString = `"${str}"`;
-      console.log(finalCppString);
-      api.setLayerByJson(0, finalCppString).then(console.log);
+      //let str = JSON.stringify(json, null, 2);
+      const orderedJSON = Object.assign(objectOrder, raw)
+      let str = JSON.stringify(orderedJSON)
+      console.log(str);
+      api.setLayerByJson(0, str).then(console.log);
+      handle.downloadAllFromFs("hah");
     }
 
     // ol demo
