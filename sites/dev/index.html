@@ -31,17 +31,15 @@
 <body>
   <h1>qgis-wasm</h1>
   <h3>QGIS-WASM</h3>
+  <div id="layers-control"></div>
+  <div id="jsoneditor" style="width: 1200px; height: 400px"></div>
+  <button id="savePro" style="width: 100px ;height:20p ">save properties</button>
+  <button id="saveVector" style="width: 100px ;height:20p ">save vector</button>
+
+
   <br />
   <div class="tabset">
-    <!---
-    <input type="radio" name="tabset" id="tab0" aria-controls="openlayers_canvas" />
-    <label for="tab0">ol: Canvas Tile</label>
-    <input type="radio" name="tabset" id="tab1" aria-controls="openlayers_preview" />
-    <label for="tab1">ol: Preview</label>
-    <input type="radio" name="tabset" id="tab2" aria-controls="openlayers_xyz" />
-    <label for="tab2">ol: XYZ Tiles </label>
-    --->
-    <input type="radio" name="tabset" id="tab1" aria-controls="javascript" checked />
+    <input type="radio" name="tabset" id="tab1" aria-controls="javascript" />
     <label for="tab1">JavaScript</label>
     <input type="radio" name="tabset" id="tab2" aria-controls="leaf" checked />
     <label for="tab2">leaf</label>
@@ -61,7 +59,6 @@
     <div id="project" style="visibility: hidden">
       <div>
         <label for="projects">Project:</label>
-
         <select name="projects" id="projects"></select>
       </div>
       <div>
@@ -70,87 +67,6 @@
     </div>
 
     <div class="tab-panels">
-      <!---
-      <section id="openlayers_canvas" class="tab-panel">
-        <h2>OpenLayers: Canvas Tile</h2>
-        <div id="ol-demo-canvas" class="demo"></div>
-        <p>
-          <a href="https://github.com/qgis/qgis-js" target="_blank">qgis-js</a>
-          provides a custom &laquo;<strong>Canvas Tile</strong>&raquo;
-          <a href="https://openlayers.org/" target="_blank">OpenLayers</a>
-          source for rendering a single tile with the size and pixel ratio of
-          the ol map canvas. This is useful for rendering in the projection of
-          the QGIS project, both in the OpenLayers view and in the qgis-js
-          runtime.
-        </p>
-        <p>
-          See
-          <a href="https://github.com/qgis/qgis-js/blob/main/packages/qgis-js-ol/src/QgisCanvasDataSource.ts"
-            target="_blank" class="source">QgisCanvasDataSource.ts</a>
-          for the implementation and the
-          <a href="https://github.com/qgis/qgis-js/blob/main/sites/dev/src/ol.ts#L130" target="_blank"
-            class="source">olDemoCanvas-function</a>
-          for the demo setup used on this page.
-        </p>
-      </section>
-
-      <section id="openlayers_preview" class="tab-panel">
-        <h2>OpenLayers: Preview</h2>
-        <div id="ol-demo-preview" class="demo"></div>
-        <div class="canvas-options">
-          <label for="previewRendering">Preview rendering:</label>
-          <input type="checkbox" checked="checked" name="previewRendering" id="previewRendering"
-            onchange="[...document.querySelectorAll('#previewTimeout, #previewOverlay')].map(e => e.disabled = !this.checked)" />
-
-          <div class="seperator">&nbsp;</div>
-
-          <label for="previewTimeout">Preview timeout:</label>
-          <input type="number" value="200" min="0" max="10000" name="previewTimeout" id="previewTimeout" />
-
-          <div class="seperator">&nbsp;</div>
-
-          <label for="previewOverlay">Preview overlay:</label>
-          <input type="checkbox" checked="checked" name="previewOverlay" id="previewOverlay" />
-        </div>
-      </section>
-
-      <section id="openlayers_xyz" class="tab-panel">
-        <h2>OpenLayers: XYZ Tiles</h2>
-        <div id="ol-demo-xyz" class="demo"></div>
-        <div class="canvas-options">
-          <label title="Factor will be multiploed with the tiles width in map units." for="extentBufferFactor">Extent
-            Buffer Factor:</label>
-          <input title="Factor will be multiploed with the tiles width in map units." type="range" min="0" max="2"
-            step="0.01" value="0.5" name="extentBufferFactor" id="extentBufferFactor"
-            oninput="this.nextElementSibling.value = (Math.round(this.value * 100) / 100).toFixed(2)" />
-          <output>0.50</output>
-
-          <div class="seperator">&nbsp;</div>
-
-          <label for="xyzBaseMap">OSM Basemap:</label>
-          <input type="checkbox" checked="checked" name="xyzBaseMap" id="xyzBaseMap" />
-        </div>
-        <p>
-          With the
-          <a href="https://github.com/qgis/qgis-js" target="_blank">qgis-js</a>
-          custom <strong>XYZ Tiles</strong> source for
-          <a href="https://openlayers.org/" target="_blank">OpenLayers</a>,
-          the QGIS project is rendered in the common Web Mercator projection
-          (EPSG:3857) addressed with the xyz tile scheme. This makes it
-          convenient to mix the QGIS layer with other layer sources provided
-          by OpenLayers.
-        </p>
-        <p>
-          See
-          <a href="https://github.com/qgis/qgis-js/blob/main/packages/qgis-js-ol/src/QgisXYZDataSource.ts"
-            target="_blank" class="source">QgisXYZDataSource.ts</a>
-          for the implementation and the
-          <a href="https://github.com/qgis/qgis-js/blob/main/sites/dev/src/ol.ts#L28" target="_blank"
-            class="source">olDemoXYZ-function</a>
-          for the demo setup used on this page.
-        </p>
-      </section>
-        --->
       <section id="javascript" class="tab-panel">
         <h2>JavaScript</h2>
         <div id="js-demo" class="demo">
@@ -168,19 +84,12 @@
       </section>
       <section id="leaf" class="tab-panel">
         <h2>leaflet</h2>
+          <input type="text" id="layerType"></input>
+          <button id="leafsave">save changes</button>
         <div id="js-demo" class="demo">
           <div id="map"></div>
-          <div style="height: 800px;"></div>
 
-          <div id="js-demo-controls">
-            <input type="text" id="layerType"></input>
-            <button id="zoomin">zoom in</button>
-            <button id="zoomout">zoom out</button>
-            <button id="panleft">left</button>
-            <button id="panright">right</button>
-            <button id="panup">up</button>
-            <button id="pandown">down</button>
-          </div>
+
         </div>
 
 
@@ -223,15 +132,10 @@ console.dir(center);
     </div>
   </div>
 
-  <div id="layers-control"></div>
   <!--
   <a class="github-fork-ribbon" href="https://github.com/qgis/qgis-js" data-ribbon="Fork me on GitHub"
     title="Fork me on GitHub">Fork me on GitHub</a>
   -->
-  <div id="jsoneditor" style="width: 1200px; height: 400px"></div>
-  <button id="savePro" style="width: 100px ;height:20p ">save properties</button>
-  <button id="saveVector" style="width: 100px ;height:20p ">save vector</button>
-
 
   <div id="wrapper"></div>
 

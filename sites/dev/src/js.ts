@@ -22,10 +22,7 @@ export function jsDemo(
     renderMap();
   });
   observer.observe(canvas, { box: "device-pixel-content-box" });
-  async function getSomeString() {
-    const myString = await api.getFields();
-    return myString;
-  }
+
 
 
 

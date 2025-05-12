@@ -24,8 +24,14 @@ export function leafDemo(
   });
   observer.observe(canvas, { box: "device-pixel-content-box" });
   */
+
   async function addLeafMap() {
-    leafEdit(await api.getLayerJson(0));
+
+    const getJson = await leafEdit(await api.getLayerJson(0));
+    document.getElementById("leafsave")!.onclick = () => {
+      const str = JSON.stringify(getJson(), null, 2);
+      api.setLayerByJson(0, str).then(console.log);
+    };
   }
 
   async function renderMap() {
