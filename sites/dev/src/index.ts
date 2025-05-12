@@ -240,7 +240,6 @@ async function initDemo() {
         if (jsButton.checked) update();
       });
     }
-    console.log("hello")
     const buttonPro = document.getElementById("savePro")!;
     const buttonVec = document.getElementById("saveVector")
     const json = await JSON.parse((await api.getLayerJson(0)));
@@ -261,11 +260,17 @@ async function initDemo() {
       handle.downloadAllFromFs("hah");
     }
 
-    const leafCanvas = document.getElementById(
+    const leafDiv = document.getElementById(
       "leaf",
-    ) as HTMLCanvasElement | null;
-    if (leafCanvas) {
-      const { update, render } = leafDemo(leafCanvas, api);
+    ) as HTMLDivElement | null;
+    if (leafDiv) {
+      //we need to figure out if we need update or render in 
+      //leaflet
+      //update should be used when we change underlying data 
+      //from other sources, not when we change zoom level in 
+      //leaflet etc ...
+
+      const { update, render } = leafDemo(leafDiv, api);
       //updateCallbacks.push(update);
       //renderCallbacks.push(render);
     }

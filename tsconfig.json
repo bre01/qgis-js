@@ -1,18 +1,31 @@
 {
   "compilerOptions": {
+    "paths": {
+      "qgis-js": [
+        "./packages/qgis-js/src/index.ts"
+      ],
+      "@qgis-js/ol": [
+        "./packages/qgis-js-ol/src/index.ts"
+      ],
+      "@qgis-js/utils": [
+        "./packages/qgis-js-utils/src/index.ts"
+      ]
+    },
     "target": "ES2022",
     "useDefineForClassFields": true,
     "module": "ESNext",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "skipLibCheck": true,
-
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,

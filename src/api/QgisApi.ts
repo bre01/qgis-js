@@ -73,6 +73,18 @@ export interface CommonQgisApi extends QgisModelConstructors {
     layerJson: string,
     callback: (tileData: boolean) => void,): void;
 
+
+  /**
+   * get Geojson of a layer specified by the layer index
+   * 
+   * @param 
+   * @returns JSON 
+   */
+  getLayerJson(
+    layerNum: number,
+  ): Promise<string>;
+
+
   /**
    * Renders an image of the loaded project and provides a QgsMapRendererParallelJob object to monitor the rendering progress and to retrieve preview images.
    *
